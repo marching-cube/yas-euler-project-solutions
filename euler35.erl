@@ -1,9 +1,8 @@
 -module(euler35). 
 -export([run/0]). 
--import(euler10, [findPrimes/1]).
 
 run() ->
-	List = lists:reverse(findPrimes(1000000)),
+	List = lists:reverse(euler10:findPrimes(1000000)),
 	Set = sets:from_list(List),
 	length(find(List, Set, 1, 1)).
 

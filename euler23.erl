@@ -1,10 +1,9 @@
 -module(euler23). 
 -export([run/0, sumOfDivisors/2]). 
--import(euler10, [findPrimes/1]).
 
 run() ->
 	Limit = 28123,
-	Primes = lists:reverse(findPrimes(Limit)),
+	Primes = lists:reverse(euler10:findPrimes(Limit)),
 	Abundants = lists:filter(fun(N) -> sumOfDivisors(N, Primes) > 2*N end, lists:seq(2, Limit)),
 	RevAbundants = lists:reverse(Abundants),
 

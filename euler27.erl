@@ -1,10 +1,9 @@
 -module(euler27). 
 -export([run/0]). 
--import(euler10, [findPrimes/1]).
 
 run() ->
 	MaxPrime = 79*79 + 79*999 + 1000,
-	Primes = lists:reverse(findPrimes(MaxPrime)),
+	Primes = lists:reverse(euler10:findPrimes(MaxPrime)),
 	BList = [ P || P <- Primes, P > 41, P < 1000 ],
 
 	lists:foldl(fun foldMax/2, {0, 0, 0},
