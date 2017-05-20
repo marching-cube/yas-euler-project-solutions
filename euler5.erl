@@ -2,12 +2,7 @@
 -export([run1/0, run2/0]). 
 
 run2() -> 
-	lists:foldl(fun(X, Acc) -> Acc * (X div gcd(X, Acc)) end, 1, lists:seq(2, 20)).
-
-gcd(A, 0) -> A;
-gcd(A, B) -> gcd(B, A rem B).
-
-
+	lists:foldl(fun(X, Acc) -> Acc * (X div common:gcd(X, Acc)) end, 1, lists:seq(2, 20)).
 
 run1() ->
 	Factors = lists:foldl(fun(X, Acc) -> mergeFactorLists(decompose(X), Acc) end, [], lists:seq(2, 20)),
