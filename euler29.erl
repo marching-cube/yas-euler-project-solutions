@@ -1,44 +1,44 @@
 -module(euler29). 
 -export([run/0]). 
 
-run() -> brute(10).
+% Remark: smart/1 implementation does not computes only powers A^B <= 100 (brute/1 computes all <= 100^100)
+% Remark: without caching of countBs results, results of countBs could be grouped for better performance
 
-brute(Max) -> 
-	Numbers = [ pown(A, B) || A <- lists:seq(2, Max), B <- lists:seq(2, Max) ],
-	_ = length(lists:usort(Numbers)),
+run() ->
+	Max = 100,
+	S = brute(Max),
+	S = smart(Max),
+	S.
 
-	SmallPrimes = [2, 3, 5, 7],
+brute(Max) ->
+	All = [ common:pown(A, B) || A <- lists:seq(2, Max), B <- lists:seq(2, Max)],
+	length(lists:usort(All)).
 
+smart(Max) -> 
+	Ks = findKs(Max),
+	lists:sum(lists:map(fun(K) -> countBs(K, Max) end, Ks))
+		+ (Max-1 - length(Ks)) * countBs(1, Max).
 
+findKs(Max) -> 
+	MaxA = trunc(math:sqrt(Max)),
+	MaxK = trunc(math:log2(Max)),
+	Ks = [ {common:pown(A, K), K} || 
+				K <- lists:seq(2, MaxK), 
+		        A <- lists:seq(2, MaxA), 
+				common:pown(A, K) =< Max ],
+				Ks,
+	lists:map(fun common:snd/1, dedup(lists:usort(Ks))).
 
-	P1 = [ {A, B, P} || A <- lists:seq(2, Max), P <- SmallPrimes, P =< trunc(math:log10(Max) / math:log10(A)), B <- lists:seq(2, Max), B rem P =:= 0, B div P > 1 ],
-	P2 = [ pown(A, B) || {A, B, _} <- P1],
+dedup([]) -> [];
+dedup([X]) -> [X];
+dedup([{X1,K1}|[{X2,K2}|T]]) when X1 =/= X2 -> [{X1,K1} | dedup([{X2,K2}|T]) ];
+dedup([{X1,K1}|[{_,K2}|T]]) -> dedup([{X1, max(K1, K2)}|T]).
 
-	% {length(P1), length(Numbers) - length(lists:usort(Numbers)) },
-	{P2, dups(Numbers, lists:usort(Numbers))}.
+countBs(1, Max) -> Max - 1;
+countBs(K, Max) -> length([ B || B <- lists:seq(2, Max), isUniqueB(B, K, Max) ]).
 
-% isDP(B, []) -> false;
-% isDP(B, [H|T]) when B rem H =:= 0 -> true;
-% isDP(B, [H|T]) -> isDP(B, T).
-
-pown(_, 0) -> 1;
-pown(X, N) when N rem 2 =:= 0 -> R = pown(X, N div 2), R * R;
-pown(X, N) -> X * pown(X, N-1).
-
-
-% DEBUG ONLY
-
-% firstDiff([], _) -> error;
-% firstDiff(_, []) -> error;
-% firstDiff([H1|_], [H2|_]) when H1 =/= H2 -> {H1, H2};
-% firstDiff([H1|T1], [H2|T2]) -> firstDiff(T1, T2).
-
-dups(L, []) -> L;
-dups(L, [H|T]) -> dups(lists:delete(H, L), T).
-
-% count(X, []) -> 0;
-% count(X, [H|T]) when X =:= H -> 1 + count(X, T);
-% count(X, [H|T]) -> count(X, T).
-
-
-
+isUniqueB(_, 1, _) -> true;
+isUniqueB(B, K, Max) -> isUniqueB(B, K, K-1, Max).
+isUniqueB(B, K, 1, Max) -> K*B > Max;
+isUniqueB(B, K, D, Max) ->
+	(((K * B) rem D =/= 0) or ((K*B) div D > Max)) and isUniqueB(B, K, D-1, Max).
