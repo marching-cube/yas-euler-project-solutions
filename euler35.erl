@@ -2,7 +2,7 @@
 -export([run/0]). 
 
 run() ->
-	List = lists:reverse(euler10:findPrimes(1000000)),
+	List = common:loadPrimes(),
 	Set = sets:from_list(List),
 	length(find(List, Set, 1, 1)).
 

@@ -2,7 +2,7 @@
 -export([run/0]).
 
 run() ->
-	List = lists:reverse(euler10:findPrimes(1000000)),
+	List = common:loadPrimes(),
 	Set = sets:from_list(List),
 	lists:sum([ N || N <- List, N > 10, rightCheck(N div 10, Set), leftCheck(N, Set)]).
 
